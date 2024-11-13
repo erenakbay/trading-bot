@@ -9,7 +9,7 @@ from typing import Union
 from typing import Optional
 from typing import Tuple
 
-from pyrobot.stock_frame import StockFrame
+from robot.stock_frame import StockFrame
 
 class Indicators():
 
@@ -106,10 +106,10 @@ class Indicators():
         
         #Clean up before returning
         self._frame.drop(
-            labels=['up_day', 'down_day', 'ewma_up', 'ewma_down', 'change_in_price'],
-            axis=1 
-            inplace=True)
-        
+            labels=['ewma_up', 'ewma_down', 'down_day', 'up_day', 'change_in_price'],
+            axis=1,
+            inplace=True
+        )
 
         return self._frame
     
