@@ -11,9 +11,11 @@ from typing import List
 from typing import Dict
 from typing import Union
 
+from robot.portfolio import Portfolio
+
 class Robot():
 
-    def __init__(self, client_id: str, redirect_uri: str, credentials_path: str = None, trading_account: str = None) -> None:
+    def __init__(self, client_id: str, redirect_uri: str, credentials_path: str = None, trading_account: str = None, paper_trading: bool = True) -> None:
 
         self.trading_account: str = trading_account
         self.client_id: str = client_id
@@ -23,6 +25,7 @@ class Robot():
         self.trades: dict = {}
         self.historical_prices: dict = {}
         self.stock_frame = None
+        self.paper_trading = paper_trading
 
     def _create_session(self) -> TDClient:
 
@@ -75,13 +78,27 @@ class Robot():
             return False
         
     def create_portfolio(self):
-        pass
+        
+        #Initialize a new Portfolio object
+        self.portfolio = Portfolio(account_number=self.trading_account)
+
+        # Assign the TDClient to the portfolio
+        self.portfolio.td_client = self.session
+
+        return self.portfolio
 
     def create_trade(self):
         pass
 
     def grab_current_quotes(self) -> dict:
-        pass
+        
+        # Grab all the symbols in the portfolio
+        symbols = self.portfolio.positions.keys()
+
+        # Grab the current quotes for all the symbols
+        quotes = self.session.get_quotes(instruments=list(symbols))
+
+        return quotes
 
     def grab_historical_prices(self) -> List[Dict]:
         pass
