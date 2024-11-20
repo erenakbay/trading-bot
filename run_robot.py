@@ -29,4 +29,59 @@ trading_robot = Robot(
     paper_trading=True
 )
 
+# Create the portfolio
+trading_robot_portfolio = trading_robot.create_portfolio()
 
+# Add positions to the portfolio
+multiple_positions = [
+    {
+        'asset_type': 'equity',
+        'quantity': 2,
+        'purchase_price': 4.00,
+        'symbol': 'TSLA',
+        'purchase_date': datetime.now()
+    },
+    {
+        'asset_type': 'equity',
+        'quantity': 2,
+        'purchase_price': 4.00,
+        'symbol': 'AAPL',
+        'purchase_date': datetime.now()
+    }
+]
+
+# Add the positions to the portfolio
+new_positions = trading_robot.portfolio.add_positions(positions=multiple_positions)
+pprint.pprint(new_positions)
+
+# Add a single position
+trading_robot.portfolio.add_position(
+    symbol='MSFT',
+    asset_type='equity',
+    purchase_date=datetime.now(),
+    quantity=3,
+    purchase_price=10.00
+)
+pprint.pprint(trading_robot.portfolio.positions)
+
+# Check if a regular market is open
+if trading_robot.regular_market_open:
+    print("The regular market is open")
+else:
+    print("The regular market is closed")
+
+# Check if the pre-market is open
+if trading_robot.pre_market_open:
+    print("The pre-market is open")
+else:
+    print("The pre-market is closed")
+
+# Check if the post-market is open
+if trading_robot.post_market_open:
+    print("The post-market is open")
+else:
+    print("The post-market is closed")
+
+# Grab teh current quote in the portfolio
+current_quote = trading_robot.grab_current_quotes()
+pprint.pprint(current_quote) 
