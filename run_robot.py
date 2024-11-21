@@ -84,4 +84,54 @@ else:
 
 # Grab teh current quote in the portfolio
 current_quote = trading_robot.grab_current_quotes()
-pprint.pprint(current_quote) 
+# pprint.pprint(current_quote
+
+# Define our date range
+end_date = datetime.today()
+start_date = end_date - timedelta(days=30)
+
+# Grab the historical prices
+historical_prices = trading_robot.grab_historical_prices(
+    start=start_date,
+    end=end_date,
+    bar_size=1,
+    bar_type='minute',
+)
+
+# convert the data to a stock frame
+stock_frame = trading_robot.create_stock_frame(data=historical_prices['aggregated'])
+
+# Print the stock frame
+pprint.pprint(stock_frame.frame.head(n=20))
+
+# Create a new Trade Object.
+new_trade = trading_robot.create_trade(
+    trade_id='long_tsla',
+    enter_or_exit='enter',
+    long_or_short='short',
+    order_type='lmt',
+    price=150.00
+)
+
+# Make it Good Till Cancel.
+new_trade.good_till_cancel(cancel_time=datetime.now() + timedelta(minutes=90))
+
+# Change the session
+new_trade.modify_session(session='am')
+
+# Add an Order Leg.
+new_trade.instrument(
+    symbol='TSLA',
+    quantity=2,
+    asset_type='EQUITY'
+)
+
+# Add a Stop Loss Order with the Main Order.
+new_trade.add_stop_loss(
+    stop_size=.10,
+    percentage=False
+)
+
+# Print out the order.
+pprint.pprint(new_trade.order)
+
