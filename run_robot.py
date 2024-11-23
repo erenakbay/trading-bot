@@ -135,3 +135,62 @@ new_trade.add_stop_loss(
 # Print out the order.
 pprint.pprint(new_trade.order)
 
+
+# create a new indicator client
+indicator_client = Indicators(price_data_frame=stock_frame)
+
+# Add the RSI Indicator
+indicator_client.rsi(period=14)
+
+# Add a 200 day simple moving average
+indicator_client.sma(period=200)
+
+# Add a 50 day exponential moving average
+indicator_client.ema(period=50)
+
+# add a signal to check for 
+indicator_client.set_indicator_signals(
+    indicator='rsi',
+    buy=40,
+    sell=20,
+    condition_buy=operator.ge,
+    condition_sell=operator.le
+)
+
+# Define the trade strategy
+trades_dict = {
+    'TSLA': {
+        'trade_func': trading_robot.trades['long_tsla'],
+        'trade_id': trading_robot.trades['long_tsla'].trade_id
+    }
+}
+
+while True:
+
+    # Grab the latest bar
+    latest_bars = trading_robot.get_latest_bar()
+
+    # Add the latest bars to the stock frame
+    stock_frame.add_rows(data=latest_bars)
+
+    # Update the indicators
+    indicator_client.refresh()
+
+    print("="*50)
+    print("Current StockFrame")
+    print("-"*50)
+    print(stock_frame.symbol_groups.tail())
+    print("-"*50)
+    print("")
+
+    # Check for signals.
+    signals = indicator_client.check_signals()
+
+    # Execute Trades.
+    trading_robot.execute_signals(signals=signals,trades_to_execute=trades_dict)
+
+    # Grab the last bar.
+    last_bar_timestamp = trading_robot.stock_frame.frame.tail(1).index.get_level_values(1)
+
+    # Wait till the next bar.
+    trading_robot.wait_till_next_bar(last_bar_timestamp=last_bar_timestamp)
